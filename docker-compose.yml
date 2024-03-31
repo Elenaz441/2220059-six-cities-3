@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   db:
-    image: mongo:7.0.7
+    image: mongo@sha256:0e145625e78b94224d16222ff2609c4621ff6e2c390300e4e6bf698305596792
     restart: always
     container_name: six-cities_mongodb
     environment:
