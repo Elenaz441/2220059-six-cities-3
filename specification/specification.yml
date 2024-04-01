@@ -1,0 +1,629 @@
+openapi: '3.0.2'
+info:
+  title: Six Cities
+  version: 1.0.0
+tags:
+  - name: offers
+    description: Действия с объявлениями.
+  - name: comments
+    description: Действия с комментариями.
+  - name: users
+    description: Действия с пользователем.
+
+paths:
+  /user/register:
+    post:
+      tags:
+        - users
+      summary: Регистрация пользователя
+      description: Регистрирует нового пользователя.
+      requestBody:
+        description: Информация для создания нового пользователя.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createUser'
+        required: true
+      responses:
+        "201":
+          description: Пользователь зарегистрирован. Объект пользователя.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+
+        "409":
+          description: Пользователь с таким email уже существует.
+
+  /user/login:
+    post:
+      tags:
+        - users
+      summary: Авторизация пользователя
+      description: Авторизует пользователя на основе логина и пароля
+      requestBody:
+        description: Почта и пароль пользователя.
+        content:
+          application/json:
+            schema:
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/user"
+                  - properties:
+                      token:
+                        type: string
+        '400':
+          description: Почта или пароль неверные
+
+    get:
+      tags:
+        - users
+      summary: Проверка состояния пользователя
+      description: Возвращает информацию по авторизованному пользователю
+      requestBody:
+        description: Токен для проверки авторизации.
+        content:
+          application/json:
+            schema:
+              properties:
+                token:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/user"
+        '400':
+          description: Ошибка в данных, которые отправил пользователь
+        '401':
+          description: Аутентификация не пройдена
+        '500':
+          description: Ошибка сервера
+
+  /user/logout:
+    delete:
+      tags:
+        - users
+      summary: Выход пользователя
+      description: Выход пользователя из личного кабинета
+      requestBody:
+        description: Токен для выхода.
+        content:
+          application/json:
+            schema:
+              properties:
+                token:
+                  type: string
+        required: true
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Неверный токен
+
+  /user/{userId}/avatar:
+    post:
+      tags:
+        - users
+      summary: Загрузить изображение аватара
+      description: Загружает изображение аватара пользователя. Изображение
+        аватара должно быть в формате `png` или `jpg`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              required:
+                - avatar
+              properties:
+                avatar:
+                  type: array
+                  items: {}
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Invalid permissions
+
+  /offer/post-offer:
+    post:
+      tags:
+        - offers
+      summary: Создание предложения
+      description: Создание предложения об аренде.
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Информация для создания нового предложения.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createOffer'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offer'
+        '400':
+          description: Ошибка в данных
+        '401':
+          description: Пользователь не авторизован
+
+  /offer/edit-offer/{offerId}:
+    patch:
+      tags:
+       - offers
+      summary: Редактирование предложения
+      description: Редактирование предложения об аренде.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Информация для редактирования предложения.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/offer'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offer'
+        '400':
+          description: Ошибка в данных
+        '401':
+          description: Пользователь не авторизован
+        '403':
+          description: Нет прав на редактирование
+
+  /offer/delete-offer/{offerId}:
+    delete:
+      tags:
+        - offers
+      summary: Удаление предложения
+      description: Удаление предложения об аренде
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Ошибка в данных
+        '401':
+          description: Пользователь не авторизован
+        '403':
+          description: Ошибка прав доступа
+
+  /offers/fetch:
+    get:
+      tags:
+        - offers
+      summary: Список предложений по аренде
+      description: По умолчанию сервис возвращает не больше 60 предложений по аренде.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/offerForList"
+        '400':
+          description: Ошибка в данных, которые отправил пользователь
+        '401':
+          description: Аутентификация не пройдена
+        '500':
+          description: Ошибка сервера
+
+  /offer/fetch/{offerId}:
+    get:
+      tags:
+        - offers
+      summary: Детальная информация по предложению
+      description: Возвращает детальную информацию по одному предложению
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/offer"
+        '400':
+          description: Ошибка в данных, которые отправил пользователь
+        '500':
+          description: Ошибка сервера
+
+  /offer/fetch-comments/{offerId}:
+    get:
+      tags:
+        - comments
+      summary: Список комментариев для предложения
+      description: Сервис предоставляет ресурс для получения списка комментариев для определённого предложения.
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Информация для создания нового предложения.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createComment'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/comment"
+        '400':
+          description: Ошибка в данных, которые отправил пользователь
+        '500':
+          description: Ошибка сервера
+
+  /offer/post-comment/{offerId}:
+    post:
+      tags:
+        - comments
+      summary: Добавление комментария
+      description: Добавление комментариея к определённому предложению по аренде.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/comment"
+
+        '400':
+          description: Ошибка в данных
+        '401':
+          description: Пользователь не авторизован
+
+  /offers/fetch-premium:
+    get:
+      tags:
+        - offers
+      summary: Премиальные предложения для города
+      description: Возвращает список премиальных предложений для определённого города.
+      parameters:
+        - name: city
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/offerForList"
+        '400':
+          description: Ошибка в данных, которые отправил пользователь
+        '500':
+          description: Ошибка сервера
+
+  /offers/fetch-favorite:
+    get:
+      tags:
+        - offers
+      summary: Список избранных предложений
+      description: Возвращает все предложения, добавленные в избранное.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/offerForList"
+        '400':
+          description: Ошибка в данных, которые отправил пользователь
+        '401':
+          description: Аутентификация не пройдена
+        '500':
+          description: Ошибка сервера
+
+  /offer/post-favorite/{offerId}:
+    patch:
+      tags:
+        - offers
+      summary: Добавление предложения в избранного
+      description:  Добавления любого предложения в спискок избранных предложений.
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Ошибка в данных
+        '401':
+          description: Пользователь не авторизован
+
+  /offer/delete-favorite/{offerId}:
+    patch:
+      tags:
+        - offers
+      summary: Удаление предложения из избранного
+      description:  Удаление любого предложения из списка избранных предложений.
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Ошибка в данных
+        '401':
+          description: Пользователь не авторизован
+
+components:
+  schemas:
+    createUser:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Keks
+        email:
+          type: string
+          example: keks@htmlacademy.ru
+        avatarUrl:
+          type: string
+          example: /avatar123.jpg
+        password:
+          type: string
+          example: 123456
+        type:
+          type: string
+          example: 'pro'
+
+    user:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+        name:
+          type: string
+          example: Keks
+        email:
+          type: string
+          example: keks@htmlacademy.ru
+        avatarUrl:
+          type: string
+          example: /avatar123.jpg
+        type:
+          type: string
+          example: 'Pro'
+
+    createOffer:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Квартира в центре Парижа
+        description:
+          type: string
+        publicationDate:
+          type: string
+          example: 2024-01-01
+        city:
+          type: string
+          example: Paris
+        preview:
+          type: string
+          description: Ссылка на изображение, которое используется в качестве превью
+        photos:
+          type: array
+        isPremium:
+          type: boolean
+        isFavourites:
+          type: boolean
+        rank:
+          type: number
+        housingType:
+          type: string
+        roomsCount:
+         type: number
+        guestsCount:
+          type: number
+        price:
+          type: number
+        conveniences:
+          type: array
+        creatorId:
+          type: string
+        commentsCount:
+          type: number
+        coordinates:
+          type: array
+
+    offer:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+        title:
+          type: string
+          example: Квартира в центре Парижа
+        description:
+          type: string
+        publicationDate:
+          type: string
+          example: 2024-01-01
+        city:
+          type: string
+          example: Paris
+        preview:
+          type: string
+          description: Ссылка на изображение, которое используется в качестве превью
+        photos:
+          type: array
+        isPremium:
+          type: boolean
+        isFavourites:
+          type: boolean
+        rank:
+          type: number
+        housingType:
+          type: string
+        roomsCount:
+         type: number
+        guestsCount:
+          type: number
+        price:
+          type: number
+        conveniences:
+          type: array
+        creatorId:
+          type: string
+        commentsCount:
+          type: number
+        coordinates:
+          type: array
+
+    offerForList:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+        title:
+          type: string
+          example: Квартира в центре Парижа
+        publicationDate:
+          type: string
+          example: 2024-01-01
+        city:
+          type: string
+          example: Paris
+        preview:
+          type: string
+          description: Ссылка на изображение, которое используется в качестве превью
+        isPremium:
+          type: boolean
+        isFavourites:
+          type: boolean
+        rank:
+          type: number
+        housingType:
+          type: string
+        price:
+          type: number
+        commentsCount:
+          type: number
+
+    createComment:
+      type: object
+      properties:
+        text:
+          type: string
+        publicationDate:
+          type: string
+          example: 2024-01-01
+        rank:
+          type: number
+        creatorId:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+
+    comment:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+        text:
+          type: string
+        publicationDate:
+          type: string
+          example: 2024-01-01
+        rank:
+          type: number
+        creatorId:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: jwt
+      description: User Token
