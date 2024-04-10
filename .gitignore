@@ -11,3 +11,4 @@ coverage
 *.log
 /.idea/
 /mocks/test-data.tsv
+.env
