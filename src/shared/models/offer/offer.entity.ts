@@ -3,15 +3,15 @@ import { Convenience, HouseingType } from '../../types/index.js';
 import { UserEntity } from '../user/index.js';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
-export interface RentOfferEntity extends defaultClasses.Base {}
+export interface OfferEntity extends defaultClasses.Base {}
 
 @modelOptions({
   schemaOptions: {
-    collection: 'rentOffer'
+    collection: 'offer'
   }
 })
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
-export class RentOfferEntity extends defaultClasses.TimeStamps {
+export class OfferEntity extends defaultClasses.TimeStamps {
   @prop({ trim: true, required: true, type: () => String })
   public title: string;
 
@@ -70,4 +70,4 @@ export class RentOfferEntity extends defaultClasses.TimeStamps {
   public coordinates: [number, number];
 }
 
-export const RentOfferModel = getModelForClass(RentOfferEntity);
+export const RentOfferModel = getModelForClass(OfferEntity);

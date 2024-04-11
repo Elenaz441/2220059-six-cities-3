@@ -11,7 +11,7 @@ tags:
     description: Действия с пользователем.
 
 paths:
-  /user/register:
+  /register:
     post:
       tags:
         - users
@@ -35,7 +35,7 @@ paths:
         "409":
           description: Пользователь с таким email уже существует.
 
-  /user/login:
+  /login:
     post:
       tags:
         - users
@@ -48,6 +48,7 @@ paths:
             schema:
               properties:
                 email:
+                  pattern: ^\S+@\S+\.\S+$
                   type: string
                 password:
                   type: string
@@ -94,7 +95,7 @@ paths:
         '500':
           description: Ошибка сервера
 
-  /user/logout:
+  /logout:
     delete:
       tags:
         - users
@@ -117,7 +118,7 @@ paths:
         '400':
           description: Неверный токен
 
-  /user/{userId}/avatar:
+  /{userId}/avatar:
     post:
       tags:
         - users
@@ -150,7 +151,29 @@ paths:
         '401':
           description: Invalid permissions
 
-  /offer/post-offer:
+  /offers:
+
+    get:
+      tags:
+        - offers
+      summary: Список предложений по аренде
+      description: По умолчанию сервис возвращает не больше 60 предложений по аренде.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/offerForList"
+        '400':
+          description: Ошибка в данных, которые отправил пользователь
+        '401':
+          description: Аутентификация не пройдена
+        '500':
+          description: Ошибка сервера
+
     post:
       tags:
         - offers
@@ -177,7 +200,30 @@ paths:
         '401':
           description: Пользователь не авторизован
 
-  /offer/edit-offer/{offerId}:
+  /offers/{offerId}:
+    get:
+      tags:
+        - offers
+      summary: Детальная информация по предложению
+      description: Возвращает детальную информацию по одному предложению
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/offer"
+        '400':
+          description: Ошибка в данных, которые отправил пользователь
+        '500':
+          description: Ошибка сервера
+
     patch:
       tags:
        - offers
@@ -212,7 +258,6 @@ paths:
         '403':
           description: Нет прав на редактирование
 
-  /offer/delete-offer/{offerId}:
     delete:
       tags:
         - offers
@@ -236,53 +281,7 @@ paths:
         '403':
           description: Ошибка прав доступа
 
-  /offers/fetch:
-    get:
-      tags:
-        - offers
-      summary: Список предложений по аренде
-      description: По умолчанию сервис возвращает не больше 60 предложений по аренде.
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/offerForList"
-        '400':
-          description: Ошибка в данных, которые отправил пользователь
-        '401':
-          description: Аутентификация не пройдена
-        '500':
-          description: Ошибка сервера
-
-  /offer/fetch/{offerId}:
-    get:
-      tags:
-        - offers
-      summary: Детальная информация по предложению
-      description: Возвращает детальную информацию по одному предложению
-      parameters:
-        - name: offerId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/offer"
-        '400':
-          description: Ошибка в данных, которые отправил пользователь
-        '500':
-          description: Ошибка сервера
-
-  /offer/fetch-comments/{offerId}:
+  /offers/{offerId}/comments:
     get:
       tags:
         - comments
@@ -315,7 +314,6 @@ paths:
         '500':
           description: Ошибка сервера
 
-  /offer/post-comment/{offerId}:
     post:
       tags:
         - comments
@@ -342,7 +340,7 @@ paths:
         '401':
           description: Пользователь не авторизован
 
-  /offers/fetch-premium:
+  /premium?city={city}:
     get:
       tags:
         - offers
@@ -366,7 +364,7 @@ paths:
         '500':
           description: Ошибка сервера
 
-  /offers/fetch-favorite:
+  /favorites:
     get:
       tags:
         - offers
@@ -388,8 +386,8 @@ paths:
         '500':
           description: Ошибка сервера
 
-  /offer/post-favorite/{offerId}:
-    patch:
+  /favorites/{offerId}:
+    post:
       tags:
         - offers
       summary: Добавление предложения в избранного
@@ -410,8 +408,7 @@ paths:
         '401':
           description: Пользователь не авторизован
 
-  /offer/delete-favorite/{offerId}:
-    patch:
+    delete:
       tags:
         - offers
       summary: Удаление предложения из избранного
@@ -442,10 +439,8 @@ components:
           example: Keks
         email:
           type: string
+          pattern: ^\S+@\S+\.\S+$
           example: keks@htmlacademy.ru
-        avatarUrl:
-          type: string
-          example: /avatar123.jpg
         password:
           type: string
           example: 123456
@@ -480,39 +475,32 @@ components:
           example: Квартира в центре Парижа
         description:
           type: string
-        publicationDate:
-          type: string
           example: 2024-01-01
         city:
-          type: string
-          example: Paris
-        preview:
+          $ref: "#/components/schemas/city"
+        previewImage:
           type: string
           description: Ссылка на изображение, которое используется в качестве превью
-        photos:
+        images:
           type: array
+          items:
+            type: string
         isPremium:
           type: boolean
-        isFavourites:
-          type: boolean
-        rank:
-          type: number
-        housingType:
+        type:
           type: string
-        roomsCount:
+        bedrooms:
          type: number
-        guestsCount:
+        maxAdults:
           type: number
         price:
           type: number
-        conveniences:
+        goods:
           type: array
-        creatorId:
-          type: string
-        commentsCount:
-          type: number
-        coordinates:
-          type: array
+          items:
+            type: string
+        location:
+          $ref: "#/components/schemas/location"
 
     offer:
       type: object
@@ -529,35 +517,38 @@ components:
           type: string
           example: 2024-01-01
         city:
-          type: string
-          example: Paris
-        preview:
+          $ref: "#/components/schemas/city"
+        previewImage:
           type: string
           description: Ссылка на изображение, которое используется в качестве превью
-        photos:
+        images:
           type: array
+          items:
+            type: string
         isPremium:
           type: boolean
         isFavourites:
           type: boolean
-        rank:
+        rating:
           type: number
-        housingType:
+        type:
           type: string
-        roomsCount:
+        bedrooms:
          type: number
-        guestsCount:
+        maxAdults:
           type: number
         price:
           type: number
-        conveniences:
+        goods:
           type: array
+          items:
+            type: string
         creatorId:
           type: string
         commentsCount:
           type: number
-        coordinates:
-          type: array
+        location:
+          $ref: "#/components/schemas/location"
 
     offerForList:
       type: object
@@ -572,18 +563,17 @@ components:
           type: string
           example: 2024-01-01
         city:
-          type: string
-          example: Paris
-        preview:
+          $ref: "#/components/schemas/city"
+        previewImage:
           type: string
           description: Ссылка на изображение, которое используется в качестве превью
         isPremium:
           type: boolean
         isFavourites:
           type: boolean
-        rank:
+        rating:
           type: number
-        housingType:
+        type:
           type: string
         price:
           type: number
@@ -593,14 +583,14 @@ components:
     createComment:
       type: object
       properties:
-        text:
+        comment:
           type: string
-        publicationDate:
+        date:
           type: string
           example: 2024-01-01
-        rank:
+        rating:
           type: number
-        creatorId:
+        user:
           type: string
           example: 6329c3d6a04ab1061c6425ea
 
@@ -610,16 +600,35 @@ components:
         id:
           type: string
           example: 6329c3d6a04ab1061c6425ea
-        text:
+        comment:
           type: string
-        publicationDate:
+        date:
           type: string
           example: 2024-01-01
-        rank:
+        rating:
           type: number
-        creatorId:
+        user:
           type: string
           example: 6329c3d6a04ab1061c6425ea
+
+    location:
+      type: object
+      properties:
+        latitude:
+          type: number
+          example: 48.85661
+
+        longitude:
+          type: number
+          example: 48.85661
+
+    city:
+      type: object
+      properties:
+        cityName:
+          type: string
+        location:
+          $ref: "#/components/schemas/location"
 
   securitySchemes:
     bearerAuth:

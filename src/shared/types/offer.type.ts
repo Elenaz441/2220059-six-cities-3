@@ -2,7 +2,7 @@ import { HouseingType } from './enums/housing-type.enum.js';
 import { Convenience } from './enums/convenience.enum.js';
 import { User } from './user.type.js';
 
-export type RentOffer = {
+export type Offer = {
   title: string;
   description: string;
   publicationDate: Date;
