@@ -3,18 +3,18 @@ import { TSVFileReader } from '../../shared/libs/file-reader/index.js';
 import chalk from 'chalk';
 import { createOffer, getErrorMessage, getMongoURI } from '../../shared/helpers/index.js';
 import { UserService } from '../../shared/models/user/user-service.interface.js';
-import { DefaultRentOfferService, RentOfferModel, RentOfferService } from '../../shared/models/rent-offer/index.js';
+import { DefaultOfferService, RentOfferModel, OfferService } from '../../shared/models/offer/index.js';
 import { DatabaseClient, MongoDatabaseClient } from '../../shared/libs/database-client/index.js';
 import { Logger } from '../../shared/libs/logger/index.js';
 import { ConsoleLogger } from '../../shared/libs/logger/console.logger.js';
 import { DefaultUserService, UserModel } from '../../shared/models/user/index.js';
 import { DEFAULT_DB_PORT, DEFAULT_USER_PASSWORD } from './command.constant.js';
-import { RentOffer } from '../../shared/types/index.js';
+import { Offer } from '../../shared/types/index.js';
 
 export class ImportCommand implements Command {
 
   private userService: UserService;
-  private rentOfferService: RentOfferService;
+  private rentOfferService: OfferService;
   private databaseClient: DatabaseClient;
   private logger: Logger;
   private salt: string;
@@ -24,7 +24,7 @@ export class ImportCommand implements Command {
     this.onCompleteImport = this.onCompleteImport.bind(this);
 
     this.logger = new ConsoleLogger();
-    this.rentOfferService = new DefaultRentOfferService(this.logger, RentOfferModel);
+    this.rentOfferService = new DefaultOfferService(this.logger, RentOfferModel);
     this.userService = new DefaultUserService(this.logger, UserModel);
     this.databaseClient = new MongoDatabaseClient(this.logger);
   }
@@ -44,7 +44,7 @@ export class ImportCommand implements Command {
     this.databaseClient.disconnect();
   }
 
-  private async saveOffer(rentOffer: RentOffer) {
+  private async saveOffer(rentOffer: Offer) {
     const user = await this.userService.findOrCreate({
       ...rentOffer.creator,
       password: DEFAULT_USER_PASSWORD
