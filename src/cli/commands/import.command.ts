@@ -2,19 +2,19 @@ import { Command } from './command.interface.js';
 import { TSVFileReader } from '../../shared/libs/file-reader/index.js';
 import chalk from 'chalk';
 import { createOffer, getErrorMessage, getMongoURI } from '../../shared/helpers/index.js';
-import { UserService } from '../../shared/models/user/user-service.interface.js';
-import { DefaultOfferService, RentOfferModel, OfferService } from '../../shared/models/offer/index.js';
+import { UserService } from '../../shared/modules/user/user-service.interface.js';
+import { DefaultOfferService, OfferModel, OfferService } from '../../shared/modules/offer/index.js';
 import { DatabaseClient, MongoDatabaseClient } from '../../shared/libs/database-client/index.js';
 import { Logger } from '../../shared/libs/logger/index.js';
 import { ConsoleLogger } from '../../shared/libs/logger/console.logger.js';
-import { DefaultUserService, UserModel } from '../../shared/models/user/index.js';
+import { DefaultUserService, UserModel } from '../../shared/modules/user/index.js';
 import { DEFAULT_DB_PORT, DEFAULT_USER_PASSWORD } from './command.constant.js';
 import { Offer } from '../../shared/types/index.js';
 
 export class ImportCommand implements Command {
 
   private userService: UserService;
-  private rentOfferService: OfferService;
+  private OfferService: OfferService;
   private databaseClient: DatabaseClient;
   private logger: Logger;
   private salt: string;
@@ -24,7 +24,7 @@ export class ImportCommand implements Command {
     this.onCompleteImport = this.onCompleteImport.bind(this);
 
     this.logger = new ConsoleLogger();
-    this.rentOfferService = new DefaultOfferService(this.logger, RentOfferModel);
+    this.OfferService = new DefaultOfferService(this.logger, OfferModel);
     this.userService = new DefaultUserService(this.logger, UserModel);
     this.databaseClient = new MongoDatabaseClient(this.logger);
   }
@@ -44,30 +44,26 @@ export class ImportCommand implements Command {
     this.databaseClient.disconnect();
   }
 
-  private async saveOffer(rentOffer: Offer) {
+  private async saveOffer(offer: Offer) {
     const user = await this.userService.findOrCreate({
-      ...rentOffer.creator,
+      ...offer.host,
       password: DEFAULT_USER_PASSWORD
     }, this.salt);
 
-    await this.rentOfferService.create({
-      title: rentOffer.title,
-      description: rentOffer.description,
-      publicationDate: rentOffer.publicationDate,
-      city: rentOffer.city,
-      preview: rentOffer.preview,
-      photos: rentOffer.photos,
-      isPremium: rentOffer.isPremium,
-      isFavourites: rentOffer.isFavourites,
-      rank: rentOffer.rank,
-      housingType: rentOffer.housingType,
-      roomsCount: rentOffer.roomsCount,
-      guestsCount: rentOffer.guestsCount,
-      price: rentOffer.price,
-      conveniences: rentOffer.conveniences,
-      creatorId: user.id,
-      commentsCount: rentOffer.commentsCount,
-      coordinates: rentOffer.coordinates
+    await this.OfferService.create({
+      title: offer.title,
+      description: offer.description,
+      city: offer.city,
+      previewImage: offer.previewImage,
+      images: offer.images,
+      isPremium: offer.isPremium,
+      type: offer.type,
+      bedrooms: offer.bedrooms,
+      maxAdults: offer.maxAdults,
+      price: offer.price,
+      goods: offer.goods,
+      host: user.id,
+      location: offer.location
     });
 
   }
