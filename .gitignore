@@ -12,3 +12,5 @@ coverage
 /.idea/
 /mocks/test-data.tsv
 .env
+
+/upload/
