@@ -4,7 +4,13 @@ import { Component } from '../../types/index.js';
 import { CreateUserRequest } from './types/create-user-request.type.js';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { BaseController, HttpError, HttpMethod, ValidateObjectIdMiddleware, ValidateDtoMiddleware } from '../../libs/rest/index.js';
+import {
+  BaseController,
+  HttpError,
+  HttpMethod, UploadFileMiddleware,
+  ValidateDtoMiddleware,
+  ValidateObjectIdMiddleware,
+} from '../../libs/rest/index.js';
 import { UserService } from './user-service.interface.js';
 import { Config, RestSchema } from '../../libs/config/index.js';
 import { fillDTO } from '../../helpers/index.js';
@@ -42,7 +48,10 @@ export class UserController extends BaseController {
       path: '/:userId/avatar',
       method: HttpMethod.Post,
       handler: this.uploadAvatar,
-      middlewares: [new ValidateObjectIdMiddleware('userId')]
+      middlewares: [
+        new ValidateObjectIdMiddleware('userId'),
+        new UploadFileMiddleware(this.configService.get('UPLOAD_DIRECTORY'), 'avatar'),
+      ]
     });
   }
 
@@ -123,11 +132,9 @@ export class UserController extends BaseController {
     );
   }
 
-  public async uploadAvatar(_req: Request, _res: Response): Promise<void> {
-    throw new HttpError(
-      StatusCodes.NOT_IMPLEMENTED,
-      'Not implemented',
-      'UserController',
-    );
+  public async uploadAvatar(req: Request, res: Response) {
+    this.created(res, {
+      filepath: req.file?.path
+    });
   }
 }
