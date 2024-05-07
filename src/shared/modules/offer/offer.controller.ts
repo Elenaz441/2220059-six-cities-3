@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify';
 import { Request, Response } from 'express';
 import {
   BaseController, DocumentExistsMiddleware,
-  HttpError,
+  HttpError, PrivateRouteMiddleware,
   HttpMethod,
   RequestQuery,
   ValidateDtoMiddleware,
@@ -37,7 +37,10 @@ export class OfferController extends BaseController {
       path: '/offers',
       method: HttpMethod.Post,
       handler: this.create,
-      middlewares: [new ValidateDtoMiddleware(CreateOfferDto)]
+      middlewares: [
+        new PrivateRouteMiddleware(),
+        new ValidateDtoMiddleware(CreateOfferDto)
+      ]
     });
 
     this.addRoute({
@@ -55,6 +58,7 @@ export class OfferController extends BaseController {
       method: HttpMethod.Patch,
       handler: this.update,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware('offerId'),
         new ValidateDtoMiddleware(UpdateOfferDto),
         new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId'),
@@ -66,19 +70,29 @@ export class OfferController extends BaseController {
       method: HttpMethod.Delete,
       handler: this.delete,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware('offerId'),
         new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId'),
       ]
     });
 
     this.addRoute({ path: '/premium', method: HttpMethod.Get, handler: this.getPremium});
-    this.addRoute({ path: '/favorites', method: HttpMethod.Get, handler: this.getFavorites});
+
+    this.addRoute({
+      path: '/favorites',
+      method: HttpMethod.Get,
+      handler: this.getFavorites,
+      middlewares: [
+        new PrivateRouteMiddleware(),
+      ]
+    });
 
     this.addRoute({
       path: '/favorites/:offerId',
       method: HttpMethod.Post,
       handler: this.addToFavorites,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware('offerId'),
         new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId'),
       ]
@@ -89,6 +103,7 @@ export class OfferController extends BaseController {
       method: HttpMethod.Delete,
       handler: this.delFromFavorites,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware('offerId'),
         new DocumentExistsMiddleware(this.offerService, 'Offer', 'offerId'),
       ]
@@ -105,17 +120,19 @@ export class OfferController extends BaseController {
     });
   }
 
-  public async index({ query } : Request<unknown, unknown, unknown, RequestQuery>, res: Response): Promise<void> {
+  public async index({ query, tokenPayload } : Request<unknown, unknown, unknown, RequestQuery>, res: Response): Promise<void> {
     const offers = await this.offerService.find(query.limit);
+    if (!tokenPayload) {
+      offers.map((offer) => {
+        offer.isFavourites = false;
+      });
+    }
     const responseData = fillDTO(OfferListRdo, offers);
     this.ok(res, responseData);
   }
 
-  public async create(
-    { body }: CreateOfferRequest,
-    res: Response
-  ): Promise<void> {
-    const result = await this.offerService.create(body);
+  public async create({ body, tokenPayload }: CreateOfferRequest, res: Response): Promise<void> {
+    const result = await this.offerService.create({ ...body, host: tokenPayload.id });
     const offer = await this.offerService.findById(result.id);
     this.created(res, fillDTO(OfferRdo, offer));
   }
