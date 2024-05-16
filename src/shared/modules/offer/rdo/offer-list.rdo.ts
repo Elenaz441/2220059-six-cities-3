@@ -18,7 +18,7 @@ export class OfferListRdo {
   public isPremium: boolean;
 
   @Expose()
-  public isFavourites?: boolean;
+  public isFavourites: boolean;
 
   @Expose()
   public createdAt: string;

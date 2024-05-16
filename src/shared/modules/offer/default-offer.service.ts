@@ -68,7 +68,7 @@ export class DefaultOfferService implements OfferService {
               { $match: { offerId: offerId } },
               { $group: {
                 _id: null,
-                avg: { '$avg': '$rank' }}
+                avg: { '$avg': '$rating' }}
               }
             ],
             as: 'avg'
