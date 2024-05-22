@@ -1,5 +1,5 @@
 import { Good, HouseingType, City } from '../../../types/index.js';
-import { IsArray, IsEnum, IsInt, IsMongoId, Max, MaxLength, Min, MinLength, IsBoolean, Length, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsInt, Max, MaxLength, Min, MinLength, IsBoolean, Length, IsString } from 'class-validator';
 import { CreateOfferValidationMessage } from './create-offer.messages.js';
 
 export class CreateOfferDto {
@@ -49,7 +49,6 @@ export class CreateOfferDto {
   @IsEnum(Good, { each: true, message: CreateOfferValidationMessage.goods.invalid })
   public goods: Good[];
 
-  @IsMongoId({ message: CreateOfferValidationMessage.host.invalidId })
   public host: string;
 
   @IsArray({ message: CreateOfferValidationMessage.location.invalidFormat })
