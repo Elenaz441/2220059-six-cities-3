@@ -9,3 +9,4 @@ export * from './user.type.js';
 export * from './location.type.js';
 export * from './mock-server-data.type.js';
 export * from './enums/sort-type.enum.js';
+export * from './document-exists.interface.js';
