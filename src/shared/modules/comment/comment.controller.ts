@@ -72,8 +72,8 @@ export default class CommentController extends BaseController {
     }
 
     const comment = await this.commentService.create({ ...body, userId: tokenPayload.id });
-    await this.offerService.incCommentCount(params.offerId);
-    // await this.offerService.updateRank(params.offerId);
     this.created(res, fillDTO(CommentRdo, comment));
+    await this.offerService.incCommentCount(params.offerId);
+    await this.offerService.updateRank(params.offerId);
   }
 }

@@ -3,7 +3,7 @@ import { CreateCommentMessages } from './create-comment.messages.js';
 
 export class CreateCommentDto {
   @IsString({ message: CreateCommentMessages.comment.invalidFormat })
-  @Length(5, 1024, { message: 'min is 5, max is 1024 '})
+  @Length(5, 1024, { message: CreateCommentMessages.comment.lengthField })
   public comment: string;
 
   @IsNumber({}, { message: CreateCommentMessages.rating.invalidFormat })
@@ -14,5 +14,6 @@ export class CreateCommentDto {
   @IsMongoId({ message: CreateCommentMessages.offerId.invalidFormat })
   public offerId: string;
 
+  @IsMongoId({ message: CreateCommentMessages.userId.invalidFormat })
   public userId: string;
 }

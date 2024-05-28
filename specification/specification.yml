@@ -87,7 +87,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/user"
+                allOf:
+                  - $ref: "#/components/schemas/user"
+                  - properties:
+                      token:
+                        type: string
         '400':
           description: Ошибка в данных, которые отправил пользователь
         '401':
@@ -141,8 +145,7 @@ paths:
                 - avatar
               properties:
                 avatar:
-                  type: array
-                  items: {}
+                  type: string
       responses:
         '200':
           description: OK
@@ -293,13 +296,6 @@ paths:
           required: true
           schema:
             type: string
-      requestBody:
-        description: Информация для создания нового предложения.
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/createComment'
-        required: true
       responses:
         '200':
           description: OK
@@ -327,6 +323,13 @@ paths:
           required: true
           schema:
             type: string
+      requestBody:
+        description: Информация для создания нового предложения.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createComment'
+        required: true
       responses:
         '200':
           description: OK
@@ -386,44 +389,32 @@ paths:
         '500':
           description: Ошибка сервера
 
-  /favorites/{offerId}:
+  /favorites/{offerId}/{status}:
     post:
       tags:
         - offers
-      summary: Добавление предложения в избранного
-      description:  Добавления любого предложения в спискок избранных предложений.
+      summary: Добавление/удаление предложения в/из избранного
+      description:  Добавления/удаление любого предложения в/из списка избранных предложений.
       parameters:
         - name: offerId
           in: path
           required: true
           schema:
             type: string
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: Ошибка в данных
-        '401':
-          description: Пользователь не авторизован
-
-    delete:
-      tags:
-        - offers
-      summary: Удаление предложения из избранного
-      description:  Удаление любого предложения из списка избранных предложений.
-      parameters:
-        - name: offerId
+        - name: status
           in: path
           required: true
           schema:
-            type: string
+            type: number
       security:
         - bearerAuth: []
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/offer"
         '400':
           description: Ошибка в данных
         '401':
@@ -475,9 +466,10 @@ components:
           example: Квартира в центре Парижа
         description:
           type: string
-          example: 2024-01-01
         city:
-          $ref: "#/components/schemas/city"
+          type: string
+          description: Один из шести городов (Paris, Cologne, Brussels, Amsterdam, Dusseldorf)
+          example: 'Paris'
         previewImage:
           type: string
           description: Ссылка на изображение, которое используется в качестве превью
@@ -500,7 +492,10 @@ components:
           items:
             type: string
         location:
-          $ref: "#/components/schemas/location"
+          type: array
+          items:
+            type: number
+          example: [48.85661, 2.351499]
 
     offer:
       type: object
@@ -513,11 +508,13 @@ components:
           example: Квартира в центре Парижа
         description:
           type: string
-        publicationDate:
+        createdAt:
           type: string
           example: 2024-01-01
         city:
-          $ref: "#/components/schemas/city"
+          type: string
+          description: Один из шести городов (Paris, Cologne, Brussels, Amsterdam, Dusseldorf)
+          example: 'Paris'
         previewImage:
           type: string
           description: Ссылка на изображение, которое используется в качестве превью
@@ -543,12 +540,15 @@ components:
           type: array
           items:
             type: string
-        creatorId:
+        host:
           type: string
         commentsCount:
           type: number
         location:
-          $ref: "#/components/schemas/location"
+          type: array
+          items:
+            type: number
+          example: [48.85661, 2.351499]
 
     offerForList:
       type: object
@@ -559,11 +559,13 @@ components:
         title:
           type: string
           example: Квартира в центре Парижа
-        publicationDate:
+        createdAt:
           type: string
           example: 2024-01-01
         city:
-          $ref: "#/components/schemas/city"
+          type: string
+          description: Один из шести городов (Paris, Cologne, Brussels, Amsterdam, Dusseldorf)
+          example: 'Paris'
         previewImage:
           type: string
           description: Ссылка на изображение, которое используется в качестве превью
@@ -585,12 +587,12 @@ components:
       properties:
         comment:
           type: string
-        date:
-          type: string
-          example: 2024-01-01
         rating:
           type: number
-        user:
+        userId:
+          type: string
+          example: 6329c3d6a04ab1061c6425ea
+        offerId:
           type: string
           example: 6329c3d6a04ab1061c6425ea
 
@@ -602,33 +604,17 @@ components:
           example: 6329c3d6a04ab1061c6425ea
         comment:
           type: string
-        date:
+        createdAt:
           type: string
           example: 2024-01-01
         rating:
           type: number
-        user:
+        userId:
           type: string
           example: 6329c3d6a04ab1061c6425ea
-
-    location:
-      type: object
-      properties:
-        latitude:
-          type: number
-          example: 48.85661
-
-        longitude:
-          type: number
-          example: 48.85661
-
-    city:
-      type: object
-      properties:
-        cityName:
+        offerId:
           type: string
-        location:
-          $ref: "#/components/schemas/location"
+          example: 6329c3d6a04ab1061c6425ea
 
   securitySchemes:
     bearerAuth:

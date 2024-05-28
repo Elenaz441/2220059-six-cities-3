@@ -1,36 +1,40 @@
 # Предложение об аренде
 ## Получить список предложений
-GET http://localhost:4000/offers?limit=2 HTTP/1.1
+GET http://localhost:4000/offers?limit=7 HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFuc0BvdmVybG9vay5uZXQiLCJuYW1lIjoiSmFjayIsImlkIjoiNjYzOWZmMDQ4NjY3OWYwY2ZkOGU1N2QwIiwiaWF0IjoxNzE2ODE1NzEzLCJleHAiOjE3MTY5ODg1MTN9.yRdSsJveWp2Rc3opTRRtiWIINhCslPVN8-dUpvN8L0I
 
 ###
 ## Получить список избранных предложений
 GET http://localhost:4000/favorites HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFuc0BvdmVybG9vay5uZXQiLCJuYW1lIjoiSmFjayIsImlkIjoiNjYzOWZmMDQ4NjY3OWYwY2ZkOGU1N2QwIiwiaWF0IjoxNzE2ODE1NzEzLCJleHAiOjE3MTY5ODg1MTN9.yRdSsJveWp2Rc3opTRRtiWIINhCslPVN8-dUpvN8L0I
 
 ###
 ## Получить объявление по идентификатору
-GET http://localhost:4000/offers/66351fd28b12c07eb189ad75 HTTP/1.1
+GET http://localhost:4000/offers/66351fd28b12c07eb189ad7f HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFuc0BvdmVybG9vay5uZXQiLCJuYW1lIjoiSmFjayIsImlkIjoiNjYzOWZmMDQ4NjY3OWYwY2ZkOGU1N2QwIiwiaWF0IjoxNzE2ODE1NzEzLCJleHAiOjE3MTY5ODg1MTN9.yRdSsJveWp2Rc3opTRRtiWIINhCslPVN8-dUpvN8L0I
 
 ###
 ## Создать новое объявление
 
 POST http://localhost:4000/offers HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFuc0BvdmVybG9vay5uZXQiLCJuYW1lIjoiSmFjayIsImlkIjoiNjYzOWZmMDQ4NjY3OWYwY2ZkOGU1N2QwIiwiaWF0IjoxNzE2ODE1NzEzLCJleHAiOjE3MTY5ODg1MTN9.yRdSsJveWp2Rc3opTRRtiWIINhCslPVN8-dUpvN8L0I
 
 {
   "title": "Отель в центре города",
   "description": "Сдается в аренду уютная квартира с прекрасным видом на море. Идеальный вариант для тех, кто ценит комфорт и красоту природы.",
   "city": "Brussels",
   "previewImage": "url/preview4.jpg",
-  "images": [
-    "url/photo3.1.jpg",
-    "url/photo3.2.jpg",
-    "url/photo3.3.jpg",
-    "url/photo3.4.jpg",
-    "url/photo3.5.jpg",
-    "url/photo3.6.jpg"
-  ],
+  # "images": [
+  #   "url/photo3.1.jpg",
+  #   "url/photo3.2.jpg",
+  #   "url/photo3.3.jpg",
+  #   "url/photo3.4.jpg",
+  #   "url/photo3.5.jpg",
+  #   "url/photo3.6.jpg"
+  # ],
   "isPremium": true,
   "bedrooms": 1,
   "maxAdults": 4,
@@ -51,16 +55,18 @@ Content-Type: application/json
 ###
 ## Удалить объявление по идентификатору
 
-DELETE http://localhost:4000/offers/66351fd28b12c07eb189ad98 HTTP/1.1
+DELETE http://localhost:4000/offers/66351fd28b12c07eb189ad7f HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFuc0BvdmVybG9vay5uZXQiLCJuYW1lIjoiSmFjayIsImlkIjoiNjYzOWZmMDQ4NjY3OWYwY2ZkOGU1N2QwIiwiaWF0IjoxNzE2OTIyNDg1LCJleHAiOjE3MTcwOTUyODV9.NB7XjcKdWu39vPZlqzEKwZMaNjY2oCDe2XxiJqsXQ9M
 
 ###
 ## Обновить объявление
 
-PATCH http://localhost:4000/offers/66351fd28b12c07eb189ad75 HTTP/1.1
+PATCH http://localhost:4000/offers/6655c485f2a8ba5db67c2871 HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFuc0BvdmVybG9vay5uZXQiLCJuYW1lIjoiSmFjayIsImlkIjoiNjYzOWZmMDQ4NjY3OWYwY2ZkOGU1N2QwIiwiaWF0IjoxNzE2OTIyNDg1LCJleHAiOjE3MTcwOTUyODV9.NB7XjcKdWu39vPZlqzEKwZMaNjY2oCDe2XxiJqsXQ9M
 
 {
-  "title": "Ночной дозор супер хаус"
+  "title": "Ночной дозор супер хаус!!!!!!!!!"
 }
 
 ###
@@ -69,15 +75,9 @@ GET http://localhost:4000/premium?city=Cologne HTTP/1.1
 
 ###
 ## Добавить предложение в избранное
-POST http://localhost:4000/favorites/66351fd28b12c07eb189ad75 HTTP/1.1
+POST http://localhost:4000/favorites/66351fd28b12c07eb189ad82/1 HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFuc0BvdmVybG9vay5uZXQiLCJuYW1lIjoiSmFjayIsImlkIjoiNjYzOWZmMDQ4NjY3OWYwY2ZkOGU1N2QwIiwiaWF0IjoxNzE1MDc2ODc2LCJleHAiOjE3MTUyNDk2NzZ9.Ddcnc9KmXQvSgfz6P6xNJGjg0dkyd18gM-cwVGnTzjA
-
-
-###
-## Удалить предложение из избранное
-DELETE http://localhost:4000/favorites/66351fd28b12c07eb189ad75 HTTP/1.1
-Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFuc0BvdmVybG9vay5uZXQiLCJuYW1lIjoiSmFjayIsImlkIjoiNjYzOWZmMDQ4NjY3OWYwY2ZkOGU1N2QwIiwiaWF0IjoxNzE2ODE1NzEzLCJleHAiOjE3MTY5ODg1MTN9.yRdSsJveWp2Rc3opTRRtiWIINhCslPVN8-dUpvN8L0I
 
 ###
 ## Список комментариев к объявлению

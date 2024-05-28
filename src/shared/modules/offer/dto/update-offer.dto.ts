@@ -11,8 +11,9 @@ import {
   MinLength,
   IsNumber,
   IsArray,
-  Length,
   IsBoolean,
+  ArrayMinSize,
+  ArrayMaxSize,
 } from 'class-validator';
 import { UpdateOfferValidationMessage } from './update-offer.messages.js';
 
@@ -40,7 +41,8 @@ export class UpdateOfferDto {
 
   @IsOptional()
   @IsArray({ message: UpdateOfferValidationMessage.images.invalidFormat })
-  @Length(6, 6, { message: UpdateOfferValidationMessage.images.length })
+  @ArrayMinSize(6, { message: UpdateOfferValidationMessage.images.length })
+  @ArrayMaxSize(6, { message: UpdateOfferValidationMessage.images.length })
   public images?: string[];
 
   @IsOptional()
@@ -90,7 +92,7 @@ export class UpdateOfferDto {
 
   @IsOptional()
   @IsArray({ message: UpdateOfferValidationMessage.location.invalidFormat })
-  @Length(2, 2, { message: UpdateOfferValidationMessage.location.length })
-  @IsInt({ each: true, message: UpdateOfferValidationMessage.location.invalidFormat })
+  @ArrayMinSize(2, { message: UpdateOfferValidationMessage.location.length })
+  @ArrayMaxSize(2, { message: UpdateOfferValidationMessage.location.length })
   public location?: [number, number];
 }
