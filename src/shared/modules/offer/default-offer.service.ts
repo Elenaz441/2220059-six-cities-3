@@ -7,12 +7,14 @@ import { OfferEntity } from './offer.entity.js';
 import { CreateOfferDto } from './dto/create-offer.dto.js';
 import { UpdateOfferDto } from './dto/update-offer.dto.js';
 import { DEFAULT_OFFER_COUNT, PREMIUM_OFFER_COUNT } from './offer.constant.js';
+import { CommentEntity } from '../comment/comment.entity.js';
 
 @injectable()
 export class DefaultOfferService implements OfferService {
   constructor(
     @inject(Component.Logger) private readonly logger: Logger,
-    @inject(Component.OfferModel) private readonly offerModel: types.ModelType<OfferEntity>
+    @inject(Component.OfferModel) private readonly offerModel: types.ModelType<OfferEntity>,
+    @inject(Component.CommentModel) private readonly commentModel: types.ModelType<CommentEntity>
   ) {}
 
   public async create(dto: CreateOfferDto): Promise<DocumentType<OfferEntity>> {
@@ -33,6 +35,7 @@ export class DefaultOfferService implements OfferService {
     const limit = count ?? DEFAULT_OFFER_COUNT;
     return this.offerModel
       .find()
+      .sort({ createdAt: SortType.Down })
       .limit(limit)
       .populate('host')
       .exec();
@@ -59,22 +62,24 @@ export class DefaultOfferService implements OfferService {
   }
 
   public async updateRank(offerId: string): Promise<DocumentType<OfferEntity> | null> {
-    const newRank = await this.offerModel
-      .aggregate([
-        {
-          $lookup: {
-            from: 'comments',
-            pipeline: [
-              { $match: { offerId: offerId } },
-              { $group: {
-                _id: null,
-                avg: { '$avg': '$rating' }}
-              }
-            ],
-            as: 'avg'
-          },
-        },
-      ]).exec();
+    const newRank = await this.commentModel.aggregate([{
+      $match: {
+        $expr: {
+          $eq: [
+            {
+              $toObjectId: offerId
+            },
+            '$offerId'
+          ]
+        }
+      }
+    }, {
+      $group: {
+        _id: null,
+        avg: { '$avg': '$rating' }
+      }
+    }
+    ]).exec();
     return this.offerModel
       .findByIdAndUpdate(offerId, {rating: newRank[0].avg}, {new: true})
       .populate('host')
@@ -94,20 +99,6 @@ export class DefaultOfferService implements OfferService {
   public async findFavourite(): Promise<DocumentType<OfferEntity>[]> {
     return this.offerModel
       .find({ isFavourites: true })
-      .populate('host')
-      .exec();
-  }
-
-  public async addOfferToFavourite(offerId: string): Promise<DocumentType<OfferEntity> | null> {
-    return this.offerModel
-      .findByIdAndUpdate(offerId, {isFavourites: true}, {new: true})
-      .populate('host')
-      .exec();
-  }
-
-  public async deleteOfferFromFavourite(offerId: string): Promise<DocumentType<OfferEntity> | null> {
-    return this.offerModel
-      .findByIdAndUpdate(offerId, {isFavourites: false}, {new: true})
       .populate('host')
       .exec();
   }
