@@ -51,6 +51,7 @@ export class CreateOfferDto {
   @IsEnum(Good, { each: true, message: CreateOfferValidationMessage.goods.invalid })
   public goods: Good[];
 
+  @IsOptional()
   @IsMongoId({ message: CreateOfferValidationMessage.host.invalidId })
   public host: string;
 

@@ -87,10 +87,18 @@ export class UserController extends BaseController {
     this.ok(res, Object.assign(responseData, { token }));
   }
 
-  public async checkStatus({ tokenPayload: { email }}: Request, res: Response): Promise<void> {
-    const foundedUser = await this.userService.findByEmail(email);
+  public async checkStatus({ tokenPayload }: Request, res: Response): Promise<void> {
+    if (!tokenPayload || !tokenPayload.email) {
+      throw new HttpError(
+        StatusCodes.UNAUTHORIZED,
+        'Unauthorized',
+        'UserController'
+      );
+    }
 
-    if (! foundedUser) {
+    const foundedUser = await this.userService.findByEmail(tokenPayload.email);
+
+    if (!foundedUser) {
       throw new HttpError(
         StatusCodes.UNAUTHORIZED,
         'Unauthorized',
@@ -122,6 +130,14 @@ export class UserController extends BaseController {
 
   public async uploadAvatar({ params, file }: Request, res: Response) {
     const { userId } = params;
+    const user = await this.userService.findById(userId);
+    if (!user) {
+      throw new HttpError(
+        StatusCodes.NOT_FOUND,
+        'User not found.',
+        'UserController',
+      );
+    }
     const uploadFile = { avatarUrl: file?.filename };
     await this.userService.updateById(userId, uploadFile);
     this.created(res, fillDTO(UploadUserAvatarRdo, { filepath: uploadFile.avatarUrl }));

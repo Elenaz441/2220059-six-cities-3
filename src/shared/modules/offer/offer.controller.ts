@@ -16,7 +16,7 @@ import { OfferListRdo } from './rdo/offer-list.rdo.js';
 import { OfferRdo } from './rdo/offer.rdo.js';
 import { StatusCodes } from 'http-status-codes';
 import { CreateOfferRequest } from './types/create-offer-request.type.js';
-import { ParamOfferId } from './types/param-offerid.type.js';
+import { ParamOfferId } from './types/param-offer-id.type.js';
 import { UpdateOfferDto } from './dto/update-offer.dto.js';
 import { CommentRdo, CommentService } from '../comment/index.js';
 import { CreateOfferDto } from './dto/create-offer.dto.js';
@@ -104,7 +104,7 @@ export class OfferController extends BaseController {
     });
 
     this.addRoute({
-      path: '/offers/:offerId/comments',
+      path: '/comments/:offerId',
       method: HttpMethod.Get,
       handler: this.getComments,
       middlewares: [
@@ -241,9 +241,9 @@ export class OfferController extends BaseController {
     if (tokenPayload) {
       const { offerId, status } = params;
       if (status === '1') {
-        await this.userService.addToFavorite(tokenPayload.id, offerId);
+        await this.userService.addFavorite(tokenPayload.id, offerId);
       } else {
-        await this.userService.delFromFavorite(tokenPayload.id, offerId);
+        await this.userService.deleteFavorite(tokenPayload.id, offerId);
       }
       const offer = await this.offerService.findById(offerId);
       if (offer) {

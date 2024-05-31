@@ -50,7 +50,7 @@ export class DefaultUserService implements UserService {
       .exec();
   }
 
-  public async addToFavorite(userId: string, offerId: string): Promise<string[] | null> {
+  public async addFavorite(userId: string, offerId: string): Promise<string[] | null> {
     const user = await this.findById(userId);
     if (user) {
       const favorites = user.favorites;
@@ -61,7 +61,7 @@ export class DefaultUserService implements UserService {
     return null;
   }
 
-  public async delFromFavorite(userId: string, offerId: string): Promise<string[] | null> {
+  public async deleteFavorite(userId: string, offerId: string): Promise<string[] | null> {
     const user = await this.findById(userId);
     if (user) {
       const favorites = user.favorites.filter((favorite) => favorite !== offerId);

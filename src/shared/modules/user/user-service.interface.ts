@@ -9,6 +9,6 @@ export interface UserService {
   findById(id: string): Promise<DocumentType<UserEntity> | null>;
   findOrCreate(dto: CreateUserDto, salt: string): Promise<DocumentType<UserEntity>>;
   updateById(userId: string, dto: UpdateUserDto): Promise<DocumentType<UserEntity> | null>;
-  addToFavorite(userId: string, offerId: string): Promise<string[] | null>;
-  delFromFavorite(userId: string, offerId: string): Promise<string[] | null>;
+  addFavorite(userId: string, offerId: string): Promise<string[] | null>;
+  deleteFavorite(userId: string, offerId: string): Promise<string[] | null>;
 }

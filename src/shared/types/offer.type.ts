@@ -1,5 +1,5 @@
 import { HouseingType } from './enums/housing-type.enum.js';
-import { Good } from './enums/convenience.enum.js';
+import { Good } from './enums/good.enum.js';
 import { User } from './user.type.js';
 import { City } from './enums/city.enum.js';
 

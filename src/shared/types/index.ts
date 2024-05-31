@@ -1,4 +1,4 @@
-export * from './enums/convenience.enum.js';
+export * from './enums/good.enum.js';
 export * from './enums/housing-type.enum.js';
 export * from './enums/user-type.enum.js';
 export * from './enums/component.enum.js';

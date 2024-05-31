@@ -31,7 +31,7 @@ export default class CommentController extends BaseController {
 
     this.logger.info('Register routes for CommentController…');
     this.addRoute({
-      path: '/offers/:offerId/comments',
+      path: '/comments/:offerId',
       method: HttpMethod.Post,
       handler: this.create,
       middlewares: [
@@ -55,10 +55,10 @@ export default class CommentController extends BaseController {
       );
     }
 
-    if (! await this.userServise.findById(body.userId)) {
+    if (! await this.userServise.findById(tokenPayload.id)) {
       throw new HttpError(
         StatusCodes.NOT_FOUND,
-        `Offer with id ${params.offerId} not found.`,
+        `User with id ${params.offerId} not found.`,
         'CommentController'
       );
     }

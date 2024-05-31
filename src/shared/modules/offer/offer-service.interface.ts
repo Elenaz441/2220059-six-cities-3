@@ -13,6 +13,6 @@ export interface OfferService extends DocumentExists {
   incCommentCount(offerId: string): Promise<DocumentType<OfferEntity> | null>;
   updateRank(offerId: string): Promise<DocumentType<OfferEntity> | null>;
   findPremium(city: string): Promise<DocumentType<OfferEntity>[]>;
-  findFavourite(): Promise<DocumentType<OfferEntity>[]>;
+  findFavourites(): Promise<DocumentType<OfferEntity>[]>;
   exists(documentId: string): Promise<boolean>;
 }

@@ -1,14 +1,14 @@
 # Комментарии к предложениям
 ## Создание комментария
-POST http://localhost:4000/offers/665628a9036ca9de0c3b4ce7/comments HTTP/1.1
+POST http://localhost:4000/comments/66351fd28b12c07eb189ad7f HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFuc0BvdmVybG9vay5uZXQiLCJuYW1lIjoiSmFjayIsImlkIjoiNjYzOWZmMDQ4NjY3OWYwY2ZkOGU1N2QwIiwiaWF0IjoxNzE2ODE1NzEzLCJleHAiOjE3MTY5ODg1MTN9.yRdSsJveWp2Rc3opTRRtiWIINhCslPVN8-dUpvN8L0I
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImV6YXN5cGtpbmFAbGlzdC5ydSIsIm5hbWUiOiLQldC70LXQvdCw0JciLCJpZCI6IjY2NTc4MGZlMmQzZTIyZTJiMzhjNDI4MCIsImlhdCI6MTcxNzAxNDY4MiwiZXhwIjoxNzE3MTg3NDgyfQ.t0pFB5oz3iXMNwuIN-scGYRPgvk2LTzHQpF8mYl9yC8
 
 {
     "comment": "Супер",
     "rating": 3,
-    "offerId": "665628a9036ca9de0c3b4ce7",
-    "userId": "6639ff0486679f0cfd8e57d0"
+    "offerId": "66351fd28b12c07eb189ad7f",
+    # "userId": "6639ff0486679f0cfd8e57d0"
 }
 
 ###
